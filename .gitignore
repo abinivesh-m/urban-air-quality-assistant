@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+record-demo.js
+screenshot-test.js
+screenshot.png
+.demo-videos/
