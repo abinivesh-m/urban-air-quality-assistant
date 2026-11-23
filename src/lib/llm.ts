@@ -43,26 +43,53 @@ export type EnvLike = Readonly<Record<string, string | undefined>>;
 /**
  * Read provider configuration from the environment.
  *
+ * OpenAI takes precedence. When only a Gemini key is present the Gemini
+ * OpenAI-compatible endpoint is used, so the same client code serves both
+ * providers (and any other OpenAI-compatible gateway such as Antigravity).
+ *
  * Returns `null` when no API key is present, which is the signal to use the
  * rule engine. Only explicitly supported variables are read; nothing is
  * inferred from unrelated env names.
  */
 export function readLlmConfig(env: EnvLike = process.env): LlmConfig | null {
-  const apiKey = env.OPENAI_API_KEY?.trim();
-  if (!apiKey) return null;
+  const openAiKey = env.OPENAI_API_KEY?.trim();
+  if (openAiKey) {
+    const configuredTimeout = Number(env.OPENAI_TIMEOUT_MS);
+    const timeoutMs =
+      Number.isFinite(configuredTimeout) && configuredTimeout > 0
+        ? Math.min(configuredTimeout, 30_000)
+        : DEFAULT_TIMEOUT_MS;
 
-  const configuredTimeout = Number(env.OPENAI_TIMEOUT_MS);
-  const timeoutMs =
-    Number.isFinite(configuredTimeout) && configuredTimeout > 0
-      ? Math.min(configuredTimeout, 30_000)
-      : DEFAULT_TIMEOUT_MS;
+    return {
+      apiKey: openAiKey,
+      baseUrl: (env.OPENAI_BASE_URL?.trim() || DEFAULT_BASE_URL).replace(/\/+$/, ""),
+      model: env.OPENAI_MODEL?.trim() || DEFAULT_MODEL,
+      timeoutMs,
+    };
+  }
 
-  return {
-    apiKey,
-    baseUrl: (env.OPENAI_BASE_URL?.trim() || DEFAULT_BASE_URL).replace(/\/+$/, ""),
-    model: env.OPENAI_MODEL?.trim() || DEFAULT_MODEL,
-    timeoutMs,
-  };
+  const geminiKey = env.GEMINI_API_KEY?.trim();
+  if (geminiKey) {
+    const configuredTimeout = Number(env.GEMINI_TIMEOUT_MS);
+    const timeoutMs =
+      Number.isFinite(configuredTimeout) && configuredTimeout > 0
+        ? Math.min(configuredTimeout, 30_000)
+        : DEFAULT_TIMEOUT_MS;
+
+    return {
+      apiKey: geminiKey,
+      baseUrl:
+        (env.GEMINI_BASE_URL?.trim() ||
+          "https://generativelanguage.googleapis.com/v1beta/openai").replace(
+          /\/+$/,
+          "",
+        ),
+      model: env.GEMINI_MODEL?.trim() || "gemini-2.0-flash",
+      timeoutMs,
+    };
+  }
+
+  return null;
 }
 
 function extractContent(payload: unknown): string | null {

@@ -71,6 +71,43 @@ describe("readLlmConfig", () => {
   });
 });
 
+describe("readLlmConfig — Gemini", () => {
+  it("uses the Gemini endpoint when only a Gemini key is present", () => {
+    const config = readLlmConfig({ GEMINI_API_KEY: "gem-key" });
+    expect(config).not.toBeNull();
+    expect(config?.apiKey).toBe("gem-key");
+    expect(config?.baseUrl).toBe(
+      "https://generativelanguage.googleapis.com/v1beta/openai",
+    );
+    expect(config?.model).toBe("gemini-2.0-flash");
+  });
+
+  it("prefers OpenAI when both keys are present", () => {
+    const config = readLlmConfig({
+      OPENAI_API_KEY: "oai-key",
+      GEMINI_API_KEY: "gem-key",
+    });
+    expect(config?.apiKey).toBe("oai-key");
+    expect(config?.baseUrl).toBe("https://api.openai.com/v1");
+  });
+
+  it("honours Gemini overrides", () => {
+    const config = readLlmConfig({
+      GEMINI_API_KEY: "gem-key",
+      GEMINI_BASE_URL: "https://gateway.example.com/gemini/",
+      GEMINI_MODEL: "gemini-1.5-pro",
+      GEMINI_TIMEOUT_MS: "4000",
+    });
+    expect(config?.baseUrl).toBe("https://gateway.example.com/gemini");
+    expect(config?.model).toBe("gemini-1.5-pro");
+    expect(config?.timeoutMs).toBe(4000);
+  });
+
+  it("returns null when neither key is present", () => {
+    expect(readLlmConfig({})).toBeNull();
+  });
+});
+
 describe("generateLlmReply", () => {
   it("returns null without configuration", async () => {
     const fetchImpl = vi.fn();

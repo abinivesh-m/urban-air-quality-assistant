@@ -227,7 +227,11 @@ works offline and in CI.
 
 ## GenAI services utilised
 
-- **OpenAI-compatible chat completions** (`src/lib/llm.ts`) — used to answer
-  open-ended questions in the assistant tab, grounded in the selected city's
-  reading. Optional via `OPENAI_API_KEY`; the deterministic rule engine
-  (`src/lib/assistant.ts`) is the fallback, so the app works without credentials.
+- **OpenAI-compatible chat completions** (`src/lib/llm.ts`) — answers open-ended
+  questions in the assistant tab, grounded in the selected city's reading.
+  The client is provider-agnostic: it talks to OpenAI by default and to
+  Google Gemini (via Gemini's OpenAI-compatible endpoint) when only a
+  `GEMINI_API_KEY` is configured, and to any other OpenAI-compatible gateway
+  such as Antigravity via `OPENAI_BASE_URL`. Optional; the deterministic rule
+  engine (`src/lib/assistant.ts`) is the fallback, so the app works without
+  credentials.
