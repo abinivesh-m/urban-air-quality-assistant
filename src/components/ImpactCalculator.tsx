@@ -56,6 +56,7 @@ const DEFAULTS: ImpactInput = {
   plasticBagsPerWeek: 5,
 };
 
+/** Live carbon footprint calculator with accessible output. */
 export function ImpactCalculator() {
   const [input, setInput] = useState<ImpactInput>(DEFAULTS);
   const groupId = useId();

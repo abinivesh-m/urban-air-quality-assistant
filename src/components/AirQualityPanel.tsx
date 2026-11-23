@@ -23,6 +23,7 @@ const SEVERITY_LABEL: Readonly<Record<Severity, string>> = {
   high: "High",
 };
 
+/** Renders the selected city's AQI, pollutant breakdown and health guidance. */
 export function AirQualityPanel({ reading }: { reading: CityReading }) {
   const classification = classifyAqi(reading.aqi);
   const percent = aqiPercent(reading.aqi);

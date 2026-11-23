@@ -26,6 +26,7 @@ const WELCOME: ChatMessage = {
     "Hi — I'm your air quality assistant. Ask about today's air, masks, purifiers, indoor air, exercising safely, or cutting your carbon footprint. My answers use the city you've selected.",
 };
 
+/** Conversational assistant grounded in the selected city's air quality reading. */
 export function AssistantChat({ cityId, cityName }: AssistantChatProps) {
   const [messages, setMessages] = useState<readonly ChatMessage[]>([WELCOME]);
   const [input, setInput] = useState("");

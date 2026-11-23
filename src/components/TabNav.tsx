@@ -17,8 +17,7 @@ interface TabNavProps<T extends string> {
 }
 
 /**
- * WAI-ARIA tabs with roving tabindex and full keyboard support
- * (Left/Right/Home/End), matching the APG tabs pattern.
+ * WAI-ARIA tabs with roving tabindex and full keyboard support.
  */
 export function TabNav<T extends string>({
   tabs,
