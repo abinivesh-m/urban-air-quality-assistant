@@ -2,57 +2,134 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --primary: 142.1 76.2% 36.3%;
-  --primary-foreground: 355.7 100% 97.5%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 142.1 76.2% 36.3%;
-  --accent-foreground: 355.7 100% 97.5%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 142.1 76.2% 36.3%;
-  --radius: 0.5rem;
-}
+@layer base {
+  :root {
+    color-scheme: light;
+  }
 
-* {
-  box-sizing: border-box;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  /* A single visible focus indicator for every interactive element. */
+  :focus-visible {
+    outline: 2px solid #047857;
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: #a7f3d0;
+    color: #052e16;
   }
 }
 
-:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
+@layer components {
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .card-lg {
+    @apply rounded-2xl border border-slate-200 bg-white shadow-md;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 transition-colors;
+  }
+
+  .input:focus {
+    @apply border-emerald-600 outline-none ring-2 ring-emerald-600/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-emerald-800;
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed bg-slate-300 text-slate-600;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-semibold text-slate-800 transition-colors;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-slate-100;
+  }
+
+  /*
+   * Badge text uses the 700/800 step of each hue on a 50-step surface so every
+   * combination clears WCAG 2.2 AA (4.5:1) for normal-sized text.
+   */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold;
+  }
+
+  .badge-good {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+
+  .badge-moderate {
+    @apply bg-amber-50 text-amber-700;
+  }
+
+  .badge-unhealthy {
+    @apply bg-orange-50 text-orange-800;
+  }
+
+  .badge-very-unhealthy {
+    @apply bg-red-50 text-red-700;
+  }
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+@layer utilities {
+  /* Range inputs, styled consistently across engines. */
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #e2e8f0;
+    cursor: pointer;
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1.1rem;
+    width: 1.1rem;
+    border-radius: 9999px;
+    background-color: #047857;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgb(15 23 42 / 0.35);
+  }
+
+  .range::-moz-range-thumb {
+    height: 1.1rem;
+    width: 1.1rem;
+    border-radius: 9999px;
+    background-color: #047857;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgb(15 23 42 / 0.35);
+  }
+}
+
+/* Respect the user's motion preference for every animation and transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

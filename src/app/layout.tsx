@@ -1,28 +1,46 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Urban Air Quality Assistant",
-  description: "GenAI-powered assistant helping families navigate urban air pollution with low-emission routines, indoor air quality hacks, and sustainable alternatives.",
-  keywords: ["air quality", "pollution", "sustainability", "GenAI", "health", "environment"],
+  metadataBase: new URL("https://urban-air-quality-assistant-xi.vercel.app"),
+  title: {
+    default: "Urban Air Quality Assistant",
+    template: "%s · Urban Air Quality Assistant",
+  },
+  description:
+    "A GenAI-style assistant that helps urban households navigate winter smog with air quality guidance, indoor air hacks, and sustainable alternatives.",
+  keywords: [
+    "air quality",
+    "AQI",
+    "PM2.5",
+    "smog",
+    "indoor air quality",
+    "sustainability",
+    "carbon footprint",
+  ],
+  authors: [{ name: "Abinivesh M" }],
+  openGraph: {
+    title: "Urban Air Quality Assistant",
+    description:
+      "Navigate winter smog with air quality guidance, indoor air hacks, and sustainable alternatives.",
+    type: "website",
+    locale: "en_GB",
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#047857",
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-green-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">
-          Skip to main content
-        </a>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

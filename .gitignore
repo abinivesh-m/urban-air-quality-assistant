@@ -32,16 +32,19 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-.vercel
+# demo / recording artifacts
 record-demo.js
 screenshot-test.js
 screenshot.png
 .demo-videos/
+demo-videos/
+*.webm
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
