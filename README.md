@@ -77,11 +77,18 @@ props, which is what makes them unit-testable.
 ## Project structure
 
 ```
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # lint, typecheck, tests, build
+├── e2e/
+│   └── smoke.spec.ts          # Playwright end-to-end smoke tests
 src/
 ├── app/
 │   ├── api/chat/route.ts      # chat endpoint (validation, rate limit, GenAI/rules)
+│   ├── error.tsx              # route-level error boundary
 │   ├── globals.css            # design tokens, components, reduced-motion support
 │   ├── layout.tsx             # metadata, viewport
+│   ├── not-found.tsx          # 404 page
 │   └── page.tsx               # composition root
 ├── components/
 │   ├── AirQualityPanel.tsx
@@ -193,7 +200,8 @@ works offline and in CI.
 
 ## Testing
 
-157 tests across seven files:
+157 unit and component tests across seven files, plus 7 end-to-end smoke tests
+(Playwright, `e2e/smoke.spec.ts`):
 
 | File | Covers |
 |---|---|
@@ -204,6 +212,7 @@ works offline and in CI.
 | `llm.test.ts` | config parsing, request shape, success/failure/malformed |
 | `api-chat.test.ts` | validation, rate limiting, GenAI path and fallback |
 | `components.test.tsx` | rendering, tabs, filters, calculator, chat, home page |
+| `e2e/smoke.spec.ts` | dashboard, city switch, tabs, assistant, accordion, calculator, skip link |
 
 ## Evaluation criteria mapping
 

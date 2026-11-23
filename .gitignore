@@ -52,3 +52,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# next.js agent file (auto-generated)
+AGENTS.md
