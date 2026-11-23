@@ -25,7 +25,7 @@ export function SustainableAlternatives() {
   );
 
   const totalSavedKg = useMemo(
-    () => visible.reduce((sum, item) => sum + item.cosCO2SavedKg, 0),
+    () => visible.reduce((sum, item) => sum + item.co2SavedKg, 0),
     [visible],
   );
 

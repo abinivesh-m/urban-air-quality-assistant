@@ -94,7 +94,7 @@ export interface SustainableAlternative {
   readonly conventional: string;
   readonly sustainable: string;
   readonly co2Saved: string;
-  readonly cosCO2SavedKg: number;
+  readonly co2SavedKg: number;
   readonly costNote: string;
 }
 
@@ -106,7 +106,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Solo petrol car commute",
     sustainable: "Metro, bus, or an EV",
     co2Saved: "≈4.6 t/year",
-    cosCO2SavedKg: 4600,
+    co2SavedKg: 4600,
     costNote: "Transit usually cheaper per month than running a car",
   },
   {
@@ -116,7 +116,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Car trips under 3 km",
     sustainable: "Walk, cycle, or e-scooter",
     co2Saved: "≈0.5 t/year",
-    cosCO2SavedKg: 500,
+    co2SavedKg: 500,
     costNote: "Free, plus health benefits",
   },
   {
@@ -126,7 +126,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Coal-heavy grid electricity",
     sustainable: "Rooftop solar with net metering",
     co2Saved: "≈3.5 t/year",
-    cosCO2SavedKg: 3500,
+    co2SavedKg: 3500,
     costNote: "Typical payback 5–7 years",
   },
   {
@@ -136,7 +136,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Gas or electric water heater",
     sustainable: "Solar water heater",
     co2Saved: "≈1.2 t/year",
-    cosCO2SavedKg: 1200,
+    co2SavedKg: 1200,
     costNote: "2–3 year payback",
   },
   {
@@ -146,7 +146,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Meat-heavy diet",
     sustainable: "More plant-based meals",
     co2Saved: "≈1.5 t/year",
-    cosCO2SavedKg: 1500,
+    co2SavedKg: 1500,
     costNote: "Often cheaper per meal",
   },
   {
@@ -156,7 +156,7 @@ export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [
     conventional: "Single-use bags and bottles",
     sustainable: "Reusable bags and bottles",
     co2Saved: "≈0.3 t/year",
-    cosCO2SavedKg: 300,
+    co2SavedKg: 300,
     costNote: "One-time ₹1,500–4,000 outlay",
   },
 ];
