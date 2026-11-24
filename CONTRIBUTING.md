@@ -15,10 +15,10 @@ All of these must pass before a pull request is merged:
 
 ```bash
 npm run lint        # ESLint (next/core-web-vitals)
-npx tsc --noEmit    # strict TypeScript
-npm test            # 161 unit and component tests
+npm run typecheck   # tsc --noEmit, strict TypeScript
+npm test            # 181 unit and component tests
 npm run build       # production build
-npx playwright test # end-to-end smoke tests
+npm run test:e2e    # end-to-end smoke tests
 ```
 
 The same checks run in CI (`.github/workflows/ci.yml`).
@@ -35,10 +35,12 @@ The same checks run in CI (`.github/workflows/ci.yml`).
 
 ## Adding a city
 
-Edit `CITIES` in `src/lib/air-quality.ts`. The dashboard, recommendations and
-assistant pick it up automatically.
+Add an entry to `CITIES` in `src/lib/air-quality/cities.ts`. The dashboard,
+recommendations and assistant pick it up automatically.
 
 ## Adding a chat intent
 
-Add an entry to `INTENTS` in `src/lib/assistant.ts` with keywords and an answer
-function, then add a test in `src/test/assistant.test.ts`.
+Add an entry to `INTENTS` in `src/lib/intents.ts` with keywords and an answer
+function, then add a test in `src/test/assistant.test.ts`. List each keyword in
+its shortest usable form — the matcher also accepts longer words that start with
+it.

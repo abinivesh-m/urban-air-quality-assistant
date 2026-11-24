@@ -121,18 +121,17 @@ urban-air-quality-assistant/
     │   ├── impact.ts              # carbon maths
     │   ├── llm.ts                 # provider config + OpenAI-compatible client
     │   └── rate-limit.ts          # fixed-window limiter + client key
-    ├── test/
-    │   ├── air-quality.test.ts
-    │   ├── api-chat.test.ts
-    │   ├── assistant.test.ts
-    │   ├── components.test.tsx
-    │   ├── content.test.ts
-    │   ├── impact.test.ts
-    │   ├── intents.test.ts
-    │   ├── llm.test.ts
-    │   ├── rate-limit.test.ts
-    │   └── setup.ts
-    └── types/index.ts             # shared type barrel
+    └── test/
+        ├── air-quality.test.ts
+        ├── api-chat.test.ts
+        ├── assistant.test.ts
+        ├── components.test.tsx
+        ├── content.test.ts
+        ├── impact.test.ts
+        ├── intents.test.ts
+        ├── llm.test.ts
+        ├── rate-limit.test.ts
+        └── setup.ts
 ```
 
 ## Tech stack
@@ -153,10 +152,11 @@ npm run dev
 Open http://localhost:3000.
 
 ```bash
-npm run build   # production build
-npm run lint    # ESLint (next/core-web-vitals)
-npm test        # Vitest, 176 tests
-npx playwright test  # end-to-end smoke tests
+npm run build      # production build
+npm run lint       # ESLint (next/core-web-vitals)
+npm run typecheck  # tsc --noEmit
+npm test           # Vitest, 181 tests
+npm run test:e2e   # Playwright end-to-end smoke tests
 ```
 
 ### GenAI configuration (optional)
@@ -224,7 +224,7 @@ works offline and in CI.
 
 ## Testing
 
-176 unit and component tests across nine files, plus 7 end-to-end smoke tests
+181 unit and component tests across nine files, plus 7 end-to-end smoke tests
 (Playwright, `e2e/smoke.spec.ts`):
 
 | File | Covers |
@@ -244,10 +244,10 @@ works offline and in CI.
 
 | Criterion | Where it is addressed |
 |---|---|
-| Code Quality | Split into focused, typed modules with single responsibilities; 176 tests |
+| Code Quality | Split into focused, typed modules with single responsibilities; 181 tests |
 | Security | Validation, rate limiting, security headers, no input reflection |
 | Efficiency | Static render, 103 kB First Load JS, pure domain modules |
-| Testing | 176 tests covering units, routes, components and accessibility hooks |
+| Testing | 181 tests covering units, routes, components and accessibility hooks |
 | Accessibility | WCAG 2.2 AA measures listed above |
 | Problem Alignment | Air quality dashboard, indoor hacks, sustainable swaps, impact calculator, contextual assistant |
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ALTERNATIVE_CATEGORIES,
   formatAnnualCo2,
+  formatTonnes,
   INDOOR_HACKS,
   SUSTAINABLE_ALTERNATIVES,
 } from "@/lib/content";
@@ -16,6 +17,22 @@ describe("formatAnnualCo2", () => {
 
   it("renders zero without throwing", () => {
     expect(formatAnnualCo2(0)).toBe("≈0.0 t/year");
+  });
+});
+
+describe("formatTonnes", () => {
+  it("converts kilograms to one-decimal tonnes", () => {
+    expect(formatTonnes(4600)).toBe("4.6");
+    expect(formatTonnes(11600)).toBe("11.6");
+    expect(formatTonnes(0)).toBe("0.0");
+  });
+
+  it("sums to the figure the tab summary displays", () => {
+    const total = SUSTAINABLE_ALTERNATIVES.reduce(
+      (sum, item) => sum + item.co2SavedKg,
+      0,
+    );
+    expect(formatTonnes(total)).toBe("11.6");
   });
 });
 

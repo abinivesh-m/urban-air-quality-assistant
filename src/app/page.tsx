@@ -19,7 +19,7 @@ import { PollutantGuide } from "@/components/PollutantGuide";
 import { Recommendations } from "@/components/Recommendations";
 import { SustainableAlternatives } from "@/components/SustainableAlternatives";
 import { TabNav, type TabDefinition } from "@/components/TabNav";
-import { CITIES, DEFAULT_CITY_ID, getCity, isKnownCity } from "@/lib/air-quality";
+import { DEFAULT_CITY, DEFAULT_CITY_ID, findCity } from "@/lib/air-quality";
 
 type TabId = "dashboard" | "assistant" | "indoor" | "alternatives" | "impact";
 
@@ -77,10 +77,10 @@ export default function HomePage() {
   const [cityId, setCityId] = useState<string>(DEFAULT_CITY_ID);
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
 
-  const reading = useMemo(() => getCity(cityId) ?? CITIES[0], [cityId]);
+  const reading = useMemo(() => findCity(cityId) ?? DEFAULT_CITY, [cityId]);
 
   const handleCityChange = useCallback((next: string) => {
-    if (isKnownCity(next)) setCityId(next);
+    if (findCity(next)) setCityId(next);
   }, []);
 
   return (

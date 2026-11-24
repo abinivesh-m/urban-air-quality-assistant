@@ -53,8 +53,13 @@ describe("matchIntent", () => {
   });
 
   it("still matches inflected forms of a keyword", () => {
+    // The catalogue lists only the shortest form, so these prove the matcher
+    // extends a keyword to the longer words built on it.
     expect(matchIntent("do houseplants help")).toBe("plants");
+    expect(matchIntent("is it safe for children")).toBe("children");
     expect(matchIntent("sustainable swaps")).toBe("alternatives");
+    expect(matchIntent("green alternatives")).toBe("alternatives");
+    expect(matchIntent("frying pan fumes")).toBe("cooking");
     expect(matchIntent("I am running tomorrow")).toBe("exercise");
   });
 });

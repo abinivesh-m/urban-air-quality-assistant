@@ -98,9 +98,19 @@ export interface SustainableAlternative {
   readonly costNote: string;
 }
 
+/**
+ * Annual CO₂ expressed in tonnes, to one decimal place.
+ *
+ * Shared by the per-swap label and the tab summary, so the two can never round
+ * or scale the same figure differently.
+ */
+export function formatTonnes(kg: number): string {
+  return (kg / 1000).toFixed(1);
+}
+
 /** Format an annual CO₂ saving for display from its kilogram value. */
 export function formatAnnualCo2(kg: number): string {
-  return `≈${(kg / 1000).toFixed(1)} t/year`;
+  return `≈${formatTonnes(kg)} t/year`;
 }
 
 export const SUSTAINABLE_ALTERNATIVES: readonly SustainableAlternative[] = [

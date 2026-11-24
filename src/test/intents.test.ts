@@ -29,6 +29,18 @@ describe("intent catalogue", () => {
     }
   });
 
+  it("does not list an inflection the matcher already covers", () => {
+    // "plant" matches "plants", so listing both would be redundant data.
+    for (const intent of INTENTS) {
+      for (const keyword of intent.keywords) {
+        const longerForms = intent.keywords.filter(
+          (other) => other !== keyword && other.startsWith(keyword),
+        );
+        expect(longerForms).toEqual([]);
+      }
+    }
+  });
+
   it("answers every intent with non-empty prose when no city is selected", () => {
     for (const intent of INTENTS) {
       expect(intent.answer({}).trim().length).toBeGreaterThan(0);

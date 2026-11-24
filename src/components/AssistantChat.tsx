@@ -37,7 +37,10 @@ function readReply(payload: unknown): string | null {
   if (typeof payload !== "object" || payload === null) return null;
 
   const reply = (payload as { reply?: unknown }).reply;
-  return typeof reply === "string" && reply.trim() ? reply : null;
+  if (typeof reply !== "string") return null;
+
+  const text = reply.trim();
+  return text || null;
 }
 
 /** Conversational assistant grounded in the selected city's air quality reading. */

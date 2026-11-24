@@ -4,16 +4,7 @@
 
 import { classifyAqi } from "./categories";
 import { pollutantSeverity } from "./pollutants";
-import type { CityReading, Recommendation, Severity } from "./types";
-
-function recommendation(
-  id: string,
-  title: string,
-  detail: string,
-  severity: Severity,
-): Recommendation {
-  return { id, title, detail, severity };
-}
+import type { CityReading, Recommendation } from "./types";
 
 /**
  * The rules combine the headline AQI band with the dominant pollutant, which is
@@ -24,97 +15,89 @@ export function buildRecommendations(
   reading: CityReading,
 ): readonly Recommendation[] {
   const { category } = classifyAqi(reading.aqi);
+  const pm25 = pollutantSeverity("pm25", reading.pm25);
   const items: Recommendation[] = [];
 
   if (category === "hazardous" || category === "very-unhealthy") {
-    items.push(
-      recommendation(
-        "stay-indoors",
-        "Stay indoors and seal gaps",
+    items.push({
+      id: "stay-indoors",
+      title: "Stay indoors and seal gaps",
+      detail:
         "At this level, outdoor exertion is the main exposure risk. Close windows and doors and run filtration continuously.",
-        "high",
-      ),
-    );
+      severity: "high",
+    });
   } else if (category === "unhealthy") {
-    items.push(
-      recommendation(
-        "limit-exertion",
-        "Move workouts indoors",
+    items.push({
+      id: "limit-exertion",
+      title: "Move workouts indoors",
+      detail:
         "Everyone should cut outdoor exertion. Shift runs and cycling to an indoor session or reschedule to a cleaner day.",
-        "high",
-      ),
-    );
+      severity: "high",
+    });
   } else if (category === "unhealthy-sensitive") {
-    items.push(
-      recommendation(
-        "protect-sensitive",
-        "Shield sensitive groups",
+    items.push({
+      id: "protect-sensitive",
+      title: "Shield sensitive groups",
+      detail:
         "Children, older adults and anyone with asthma or heart conditions should keep outdoor time short.",
-        "elevated",
-      ),
-    );
+      severity: "elevated",
+    });
   } else {
-    items.push(
-      recommendation(
-        "ventilate",
-        "Ventilate while air is clean",
+    items.push({
+      id: "ventilate",
+      title: "Ventilate while air is clean",
+      detail:
         "Conditions are favourable — open windows to flush indoor air and air out cooking and cleaning fumes.",
-        "low",
-      ),
-    );
+      severity: "low",
+    });
   }
 
-  if (pollutantSeverity("pm25", reading.pm25) === "high") {
-    items.push(
-      recommendation(
-        "filtration",
-        "Run HEPA filtration in the bedroom",
+  if (pm25 === "high") {
+    items.push({
+      id: "filtration",
+      title: "Run HEPA filtration in the bedroom",
+      detail:
         "PM2.5 is the dominant risk right now. Run a HEPA purifier sized for the room, or build a Corsi-Rosenthal box for a low-cost equivalent.",
-        "high",
-      ),
-    );
-  } else if (pollutantSeverity("pm25", reading.pm25) === "elevated") {
-    items.push(
-      recommendation(
-        "filtration-light",
-        "Keep filtration running overnight",
+      severity: "high",
+    });
+  } else if (pm25 === "elevated") {
+    items.push({
+      id: "filtration-light",
+      title: "Keep filtration running overnight",
+      detail:
         "Elevated PM2.5 builds up while you sleep. A purifier on low overnight measurably lowers morning exposure.",
-        "elevated",
-      ),
-    );
+      severity: "elevated",
+    });
   }
 
   if (pollutantSeverity("no2", reading.no2) === "high") {
-    items.push(
-      recommendation(
-        "avoid-roadside",
-        "Avoid walking beside traffic",
+    items.push({
+      id: "avoid-roadside",
+      title: "Avoid walking beside traffic",
+      detail:
         "NO₂ is elevated, which points to vehicle exhaust. Choose back-street routes and keep away from junctions at peak hours.",
-        "elevated",
-      ),
-    );
+      severity: "elevated",
+    });
   }
 
   if (pollutantSeverity("o3", reading.o3) === "elevated") {
-    items.push(
-      recommendation(
-        "avoid-afternoon",
-        "Avoid afternoon outdoor activity",
+    items.push({
+      id: "avoid-afternoon",
+      title: "Avoid afternoon outdoor activity",
+      detail:
         "Ozone peaks in sunny afternoons. Schedule errands and exercise for early morning when levels are lower.",
-        "elevated",
-      ),
-    );
+      severity: "elevated",
+    });
   }
 
   if (reading.humidity > 75) {
-    items.push(
-      recommendation(
-        "humidity",
-        "Manage indoor humidity",
+    items.push({
+      id: "humidity",
+      title: "Manage indoor humidity",
+      detail:
         "High outdoor humidity plus closed windows encourages damp and mould. Vent bathrooms and kitchens and keep indoor humidity under 60%.",
-        "low",
-      ),
-    );
+      severity: "low",
+    });
   }
 
   return items.slice(0, 4);

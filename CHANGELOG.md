@@ -20,13 +20,26 @@ All notable changes to this project are documented here.
   consistency.
 - Reused `AQI_SCALE_MAX` and `MAX_MESSAGE_LENGTH` instead of duplicated
   magic numbers.
+- Added `findCity()` so an untrusted id resolves to its reading in one step,
+  replacing the check-then-lookup pair in the route and the page.
+- Exported the default city as the record itself, so reordering `CITIES` cannot
+  desync it from `DEFAULT_CITY_ID`.
+- Shared the kilogram-to-tonne formatting between the per-swap label and the
+  tab summary instead of converting in two places.
+- Labelled observed timestamps as UTC, since the sample readings carry different
+  local offsets.
+- Limited intent keywords to the shortest form the matcher extends, with a test
+  enforcing the convention.
 
 ### Removed
 - Unused `create-next-app` SVG assets from `public/`.
 - Dead `eslint.config.mjs` flat config (ESLint 8 reads `.eslintrc.json`).
+- The unused `src/types` barrel: nothing imported it, and it duplicated every
+  domain type.
 
 ### Added
 - Tests for the content catalogue, CO₂ formatting and intent-data invariants.
+- `typecheck` and `test:e2e` npm scripts, used by CI and the README.
 
 ## [1.2.0] - 2026-11-23
 

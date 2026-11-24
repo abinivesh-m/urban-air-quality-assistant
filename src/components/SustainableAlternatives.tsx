@@ -7,6 +7,7 @@ import { CONTENT_ICONS } from "@/components/ContentIcons";
 import {
   ALTERNATIVE_CATEGORIES,
   formatAnnualCo2,
+  formatTonnes,
   SUSTAINABLE_ALTERNATIVES,
 } from "@/lib/content";
 
@@ -64,7 +65,7 @@ export function SustainableAlternatives() {
       <p className="mt-3 text-xs text-slate-600" aria-live="polite">
         Showing {visible.length} swap{visible.length === 1 ? "" : "s"} · up to{" "}
         <strong className="font-semibold text-emerald-800">
-          {(totalSavedKg / 1000).toFixed(1)} t CO₂
+          {formatTonnes(totalSavedKg)} t CO₂
         </strong>{" "}
         avoided per year if all are adopted.
       </p>

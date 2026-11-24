@@ -4,10 +4,11 @@ import {
   aqiPercent,
   buildRecommendations,
   CITIES,
-  CITY_IDS,
   clampAqi,
   classifyAqi,
+  DEFAULT_CITY,
   DEFAULT_CITY_ID,
+  findCity,
   formatObservedAt,
   getCity,
   isKnownCity,
@@ -97,18 +98,30 @@ describe("pollutantSeverity", () => {
 });
 
 describe("city dataset", () => {
-  it("exposes a stable id for every city", () => {
-    expect(CITY_IDS).toHaveLength(CITIES.length);
-    expect(new Set(CITY_IDS).size).toBe(CITY_IDS.length);
+  it("exposes a stable, unique id for every city", () => {
+    const ids = CITIES.map((city) => city.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("contains the default city", () => {
-    expect(CITY_IDS).toContain(DEFAULT_CITY_ID);
-    expect(getCity(DEFAULT_CITY_ID)).toBeDefined();
+  it("keeps the default city inside the dataset", () => {
+    expect(DEFAULT_CITY.id).toBe(DEFAULT_CITY_ID);
+    expect(getCity(DEFAULT_CITY_ID)).toBe(DEFAULT_CITY);
   });
 
   it("returns undefined for an unknown id", () => {
     expect(getCity("atlantis")).toBeUndefined();
+  });
+
+  it("resolves an untrusted id to its record in one step", () => {
+    expect(findCity("delhi")?.city).toBe("New Delhi");
+    expect(findCity("atlantis")).toBeUndefined();
+  });
+
+  it("rejects values that are not city ids at all", () => {
+    expect(findCity(null)).toBeUndefined();
+    expect(findCity(42)).toBeUndefined();
+    expect(findCity("__proto__")).toBeUndefined();
+    expect(findCity("toString")).toBeUndefined();
   });
 
   it("only accepts known ids", () => {
@@ -163,8 +176,10 @@ describe("buildRecommendations", () => {
 });
 
 describe("formatObservedAt", () => {
-  it("formats a valid ISO timestamp", () => {
-    expect(formatObservedAt("2026-11-22T08:30:00Z")).toContain("2026");
+  it("formats a valid ISO timestamp in UTC", () => {
+    const formatted = formatObservedAt("2026-11-22T08:30:00Z");
+    expect(formatted).toContain("2026");
+    expect(formatted.endsWith("UTC")).toBe(true);
   });
 
   it("degrades gracefully on invalid input", () => {

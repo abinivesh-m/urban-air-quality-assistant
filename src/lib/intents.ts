@@ -4,6 +4,11 @@
  * Pure data plus answer builders, kept separate from the matching engine in
  * `assistant.ts` so the catalogue can be reviewed, extended and tested on its
  * own without touching scoring logic.
+ *
+ * Keyword convention: list each word in its shortest usable form, because the
+ * matcher also accepts longer words that start with it ("plant" covers
+ * "plants", "swap" covers "swaps"). Irregular forms that are not a prefix
+ * ("cycle" / "cycling") must be listed explicitly.
  */
 
 import { classifyAqi, type CityReading } from "./air-quality";
@@ -61,7 +66,6 @@ export const INTENTS: readonly IntentDefinition[] = [
     id: "exercise",
     keywords: [
       "run",
-      "running",
       "jog",
       "exercise",
       "workout",
@@ -131,7 +135,7 @@ export const INTENTS: readonly IntentDefinition[] = [
   },
   {
     id: "children",
-    keywords: ["child", "children", "kid", "baby", "school", "toddler"],
+    keywords: ["child", "kid", "baby", "school", "toddler"],
     answer: ({ reading }) => {
       const base =
         "Children breathe more air per kilogram of body weight and their lungs are still developing, so they take on a higher dose than adults at the same AQI.";
@@ -143,13 +147,13 @@ export const INTENTS: readonly IntentDefinition[] = [
   },
   {
     id: "cooking",
-    keywords: ["cook", "cooking", "kitchen", "stove", "fry", "frying"],
+    keywords: ["cook", "kitchen", "stove", "fry"],
     answer: () =>
       "Cooking is often the largest indoor PM2.5 source. Always run the exhaust fan or open a window while cooking, use lids to keep steam and smoke contained, and prefer simmering or baking over high-heat frying on heavy smog days.",
   },
   {
     id: "plants",
-    keywords: ["plant", "plants", "houseplant", "spider plant", "snake plant"],
+    keywords: ["plant", "houseplant"],
     answer: () =>
       "Houseplants remove some volatile organic compounds but their real-world impact on PM2.5 is small — the NASA chamber study used sealed conditions no home reproduces. Treat plants as a pleasant extra, not a substitute for filtration or ventilation.",
   },
@@ -183,15 +187,7 @@ export const INTENTS: readonly IntentDefinition[] = [
   },
   {
     id: "alternatives",
-    keywords: [
-      "alternative",
-      "alternatives",
-      "sustainable",
-      "swap",
-      "eco",
-      "green",
-      "solar",
-    ],
+    keywords: ["alternative", "sustainable", "swap", "eco", "green", "solar"],
     answer: () =>
       "The highest-leverage swaps are replacing solo car trips with transit or an EV (around 4.6 tonnes CO₂ a year), moving a gas water heater to solar (around 1.2 tonnes), and shifting meat-heavy meals toward plant-based (around 1.5 tonnes). The Sustainable tab lists each swap with its saving and payback.",
   },

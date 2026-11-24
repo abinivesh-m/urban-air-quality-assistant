@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-import { classifyAqi, getCity, isKnownCity, type CityReading } from "@/lib/air-quality";
+import { classifyAqi, findCity, type CityReading } from "@/lib/air-quality";
 import { answerQuestion, MAX_MESSAGE_LENGTH } from "@/lib/assistant";
 import { generateLlmReply, readLlmConfig } from "@/lib/llm";
 import { createRateLimiter, resolveClientKey } from "@/lib/rate-limit";
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { message, cityId } = parsed.data;
-  const reading = isKnownCity(cityId) ? getCity(cityId) : undefined;
+  const reading = findCity(cityId);
 
   const ruleAnswer = answerQuestion(message, { reading });
 
