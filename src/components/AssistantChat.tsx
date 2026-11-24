@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Loader2, Send, Sparkles } from "lucide-react";
 
-import { SUGGESTED_PROMPTS } from "@/lib/assistant";
+import { MAX_MESSAGE_LENGTH, SUGGESTED_PROMPTS } from "@/lib/assistant";
 
 interface ChatMessage {
   readonly id: string;
@@ -17,14 +17,28 @@ interface AssistantChatProps {
   readonly cityName: string;
 }
 
-const MAX_LENGTH = 500;
-
 const WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
     "Hi — I'm your air quality assistant. Ask about today's air, masks, purifiers, indoor air, exercising safely, or cutting your carbon footprint. My answers use the city you've selected.",
 };
+
+const UNUSABLE_REPLY =
+  "Sorry — I didn't get a usable answer. Please try rephrasing.";
+
+/**
+ * Read the `reply` field out of an untrusted response body.
+ *
+ * The API is the trust boundary here, so the shape is checked at runtime rather
+ * than assumed from a type assertion.
+ */
+function readReply(payload: unknown): string | null {
+  if (typeof payload !== "object" || payload === null) return null;
+
+  const reply = (payload as { reply?: unknown }).reply;
+  return typeof reply === "string" && reply.trim() ? reply : null;
+}
 
 /** Conversational assistant grounded in the selected city's air quality reading. */
 export function AssistantChat({ cityId, cityName }: AssistantChatProps) {
@@ -44,7 +58,7 @@ export function AssistantChat({ cityId, cityName }: AssistantChatProps) {
 
   const send = useCallback(
     async (raw: string) => {
-      const text = raw.trim().slice(0, MAX_LENGTH);
+      const text = raw.trim().slice(0, MAX_MESSAGE_LENGTH);
       if (!text || isSending) return;
 
       sequence.current += 1;
@@ -71,13 +85,7 @@ export function AssistantChat({ cityId, cityName }: AssistantChatProps) {
         }
 
         const data: unknown = await response.json();
-        const reply =
-          typeof data === "object" &&
-          data !== null &&
-          "reply" in data &&
-          typeof (data as { reply: unknown }).reply === "string"
-            ? (data as { reply: string }).reply
-            : "Sorry — I didn't get a usable answer. Please try rephrasing.";
+        const reply = readReply(data) ?? UNUSABLE_REPLY;
 
         sequence.current += 1;
         setMessages((previous) => [
@@ -195,7 +203,7 @@ export function AssistantChat({ cityId, cityName }: AssistantChatProps) {
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            maxLength={MAX_LENGTH}
+            maxLength={MAX_MESSAGE_LENGTH}
             placeholder="Ask about air quality…"
             autoComplete="off"
             aria-describedby={helperId}

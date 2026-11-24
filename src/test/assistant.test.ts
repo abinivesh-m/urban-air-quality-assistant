@@ -42,6 +42,21 @@ describe("matchIntent", () => {
     // "air purifier" should win over the generic "air" family.
     expect(matchIntent("should I buy an air purifier")).toBe("purifier");
   });
+
+  it("matches whole words, not fragments inside other words", () => {
+    expect(matchIntent("this is fine")).toBeNull();
+    expect(matchIntent("everything is fine")).toBeNull();
+  });
+
+  it("matches a short keyword on its own", () => {
+    expect(matchIntent("hi")).toBe("greeting");
+  });
+
+  it("still matches inflected forms of a keyword", () => {
+    expect(matchIntent("do houseplants help")).toBe("plants");
+    expect(matchIntent("sustainable swaps")).toBe("alternatives");
+    expect(matchIntent("I am running tomorrow")).toBe("exercise");
+  });
 });
 
 describe("answerQuestion", () => {

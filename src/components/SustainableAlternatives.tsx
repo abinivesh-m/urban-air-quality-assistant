@@ -3,9 +3,10 @@
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
-import { CONTENT_ICONS } from "@/components/content-icons";
+import { CONTENT_ICONS } from "@/components/ContentIcons";
 import {
   ALTERNATIVE_CATEGORIES,
+  formatAnnualCo2,
   SUSTAINABLE_ALTERNATIVES,
 } from "@/lib/content";
 
@@ -81,7 +82,7 @@ export function SustainableAlternatives() {
                   </span>
                 </div>
                 <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-800">
-                  {item.co2Saved}
+                  {formatAnnualCo2(item.co2SavedKg)}
                 </span>
               </div>
 

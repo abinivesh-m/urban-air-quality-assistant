@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
-import { CONTENT_ICONS } from "@/components/content-icons";
+import { CONTENT_ICONS } from "@/components/ContentIcons";
 import { INDOOR_HACKS } from "@/lib/content";
 
 /**

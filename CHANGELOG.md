@@ -2,6 +2,32 @@
 
 All notable changes to this project are documented here.
 
+## [1.3.0] - 2026-11-24
+
+### Changed
+- Split `src/lib/air-quality.ts` into a focused `src/lib/air-quality/` package
+  (types, categories, pollutants, cities, recommendations, format) behind a
+  stable `index.ts` barrel, so no consumer import changed.
+- Split the intent catalogue out of `src/lib/assistant.ts` into
+  `src/lib/intents.ts`, leaving the assistant as a pure scoring engine.
+- Deduplicated provider resolution in `src/lib/llm.ts` behind a provider table
+  with shared timeout and base-URL helpers.
+- Derived the displayed CO₂ saving from `co2SavedKg` via `formatAnnualCo2`,
+  removing a second source of truth.
+- Extracted a `TabPanel` component and a shared focus-ring class in `page.tsx`
+  instead of repeating five near-identical panels.
+- Renamed `content-icons.tsx` to `ContentIcons.tsx` for component naming
+  consistency.
+- Reused `AQI_SCALE_MAX` and `MAX_MESSAGE_LENGTH` instead of duplicated
+  magic numbers.
+
+### Removed
+- Unused `create-next-app` SVG assets from `public/`.
+- Dead `eslint.config.mjs` flat config (ESLint 8 reads `.eslintrc.json`).
+
+### Added
+- Tests for the content catalogue, CO₂ formatting and intent-data invariants.
+
 ## [1.2.0] - 2026-11-23
 
 ### Added

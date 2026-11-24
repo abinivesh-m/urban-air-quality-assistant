@@ -23,6 +23,7 @@ export interface LlmInput {
 const DEFAULT_BASE_URL = "https://api.openai.com/v1";
 const DEFAULT_MODEL = "gpt-4o-mini";
 const DEFAULT_TIMEOUT_MS = 8000;
+const MAX_TIMEOUT_MS = 30_000;
 const MAX_REPLY_LENGTH = 1200;
 
 export const SYSTEM_PROMPT = [
@@ -40,53 +41,77 @@ export const SYSTEM_PROMPT = [
 /** Minimal environment shape, so tests can pass plain objects. */
 export type EnvLike = Readonly<Record<string, string | undefined>>;
 
+interface ProviderSpec {
+  /** Environment variable holding the API key. Also orders precedence. */
+  readonly keyVar: string;
+  readonly baseUrlVar: string;
+  readonly modelVar: string;
+  readonly timeoutVar: string;
+  readonly defaultBaseUrl: string;
+  readonly defaultModel: string;
+}
+
+/**
+ * Supported OpenAI-compatible providers, in precedence order.
+ *
+ * Gemini exposes an OpenAI-compatible endpoint, so the same client code serves
+ * both it and any other compatible gateway such as Antigravity.
+ */
+const PROVIDERS: readonly ProviderSpec[] = [
+  {
+    keyVar: "OPENAI_API_KEY",
+    baseUrlVar: "OPENAI_BASE_URL",
+    modelVar: "OPENAI_MODEL",
+    timeoutVar: "OPENAI_TIMEOUT_MS",
+    defaultBaseUrl: DEFAULT_BASE_URL,
+    defaultModel: DEFAULT_MODEL,
+  },
+  {
+    keyVar: "GEMINI_API_KEY",
+    baseUrlVar: "GEMINI_BASE_URL",
+    modelVar: "GEMINI_MODEL",
+    timeoutVar: "GEMINI_TIMEOUT_MS",
+    defaultBaseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+    defaultModel: "gemini-2.0-flash",
+  },
+];
+
+/** Parse a timeout override, clamped to a safe ceiling. */
+function resolveTimeout(raw: string | undefined): number {
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_TIMEOUT_MS;
+  return Math.min(parsed, MAX_TIMEOUT_MS);
+}
+
+/** Normalise a base URL: fall back to the default and trim trailing slashes. */
+function resolveBaseUrl(raw: string | undefined, fallback: string): string {
+  return (raw?.trim() || fallback).replace(/\/+$/, "");
+}
+
+function configFor(
+  spec: ProviderSpec,
+  apiKey: string,
+  env: EnvLike,
+): LlmConfig {
+  return {
+    apiKey,
+    baseUrl: resolveBaseUrl(env[spec.baseUrlVar], spec.defaultBaseUrl),
+    model: env[spec.modelVar]?.trim() || spec.defaultModel,
+    timeoutMs: resolveTimeout(env[spec.timeoutVar]),
+  };
+}
+
 /**
  * Read provider configuration from the environment.
- *
- * OpenAI takes precedence. When only a Gemini key is present the Gemini
- * OpenAI-compatible endpoint is used, so the same client code serves both
- * providers (and any other OpenAI-compatible gateway such as Antigravity).
  *
  * Returns `null` when no API key is present, which is the signal to use the
  * rule engine. Only explicitly supported variables are read; nothing is
  * inferred from unrelated env names.
  */
 export function readLlmConfig(env: EnvLike = process.env): LlmConfig | null {
-  const openAiKey = env.OPENAI_API_KEY?.trim();
-  if (openAiKey) {
-    const configuredTimeout = Number(env.OPENAI_TIMEOUT_MS);
-    const timeoutMs =
-      Number.isFinite(configuredTimeout) && configuredTimeout > 0
-        ? Math.min(configuredTimeout, 30_000)
-        : DEFAULT_TIMEOUT_MS;
-
-    return {
-      apiKey: openAiKey,
-      baseUrl: (env.OPENAI_BASE_URL?.trim() || DEFAULT_BASE_URL).replace(/\/+$/, ""),
-      model: env.OPENAI_MODEL?.trim() || DEFAULT_MODEL,
-      timeoutMs,
-    };
-  }
-
-  const geminiKey = env.GEMINI_API_KEY?.trim();
-  if (geminiKey) {
-    const configuredTimeout = Number(env.GEMINI_TIMEOUT_MS);
-    const timeoutMs =
-      Number.isFinite(configuredTimeout) && configuredTimeout > 0
-        ? Math.min(configuredTimeout, 30_000)
-        : DEFAULT_TIMEOUT_MS;
-
-    return {
-      apiKey: geminiKey,
-      baseUrl:
-        (env.GEMINI_BASE_URL?.trim() ||
-          "https://generativelanguage.googleapis.com/v1beta/openai").replace(
-          /\/+$/,
-          "",
-        ),
-      model: env.GEMINI_MODEL?.trim() || "gemini-2.0-flash",
-      timeoutMs,
-    };
+  for (const spec of PROVIDERS) {
+    const apiKey = env[spec.keyVar]?.trim();
+    if (apiKey) return configFor(spec, apiKey, env);
   }
 
   return null;

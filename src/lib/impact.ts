@@ -60,6 +60,13 @@ export const ACHIEVABLE_REDUCTIONS = {
   plastic: 0.75,
 } as const;
 
+/**
+ * Outer bounds accepted from any caller (sliders, tests, a future API).
+ *
+ * The UI may expose a narrower slider range for usability. Anything outside
+ * these bounds is clamped rather than rejected, so an odd input can never
+ * produce NaN in the total.
+ */
 const LIMITS = {
   carKmPerDay: { min: 0, max: 300 },
   meatMealsPerWeek: { min: 0, max: 21 },

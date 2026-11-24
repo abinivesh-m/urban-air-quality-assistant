@@ -1,6 +1,4 @@
-import { POLLUTANT_META, type PollutantKey } from "@/lib/air-quality";
-
-const ORDER: readonly PollutantKey[] = ["pm25", "pm10", "no2", "o3", "co"];
+import { POLLUTANT_META, POLLUTANT_ORDER } from "@/lib/air-quality";
 
 /** Short reference glossary for the dashboard sidebar. */
 export function PollutantGuide() {
@@ -13,7 +11,7 @@ export function PollutantGuide() {
         What am I breathing?
       </h2>
       <dl className="mt-3 space-y-2.5">
-        {ORDER.map((key) => (
+        {POLLUTANT_ORDER.map((key) => (
           <div key={key}>
             <dt className="text-xs font-semibold text-slate-900">
               {POLLUTANT_META[key].label}{" "}

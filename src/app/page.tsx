@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   Calculator,
   Home as HomeIcon,
@@ -40,6 +40,38 @@ const TABS: readonly TabDefinition<TabId>[] = [
 ];
 
 const panelId = (id: TabId) => `panel-${id}`;
+
+const PANEL_FOCUS_CLASS =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2";
+
+interface TabPanelProps {
+  readonly id: TabId;
+  readonly activeTab: TabId;
+  /** Layout width for the panel; content is centred unless overridden. */
+  readonly widthClass?: string;
+  readonly children: ReactNode;
+}
+
+/**
+ * A single accessible tab panel.
+ *
+ * Keeping the role, labelling, focus ring and hidden state in one component
+ * means none of the five tabs can drift out of sync with the others.
+ */
+function TabPanel({ id, activeTab, widthClass = "", children }: TabPanelProps) {
+  return (
+    <div
+      role="tabpanel"
+      id={panelId(id)}
+      aria-labelledby={`tab-${id}`}
+      tabIndex={0}
+      hidden={activeTab !== id}
+      className={`${PANEL_FOCUS_CLASS} ${widthClass}`.trim()}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [cityId, setCityId] = useState<string>(DEFAULT_CITY_ID);
@@ -91,14 +123,7 @@ export default function HomePage() {
         />
 
         <div>
-          <div
-            role="tabpanel"
-            id={panelId("dashboard")}
-            aria-labelledby="tab-dashboard"
-            tabIndex={0}
-            hidden={activeTab !== "dashboard"}
-            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-          >
+          <TabPanel id="dashboard" activeTab={activeTab}>
             <div className="grid gap-5 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <AirQualityPanel reading={reading} />
@@ -108,51 +133,27 @@ export default function HomePage() {
                 <PollutantGuide />
               </div>
             </div>
-          </div>
+          </TabPanel>
 
-          <div
-            role="tabpanel"
-            id={panelId("assistant")}
-            aria-labelledby="tab-assistant"
-            tabIndex={0}
-            hidden={activeTab !== "assistant"}
-            className="mx-auto max-w-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-          >
+          <TabPanel id="assistant" activeTab={activeTab} widthClass="mx-auto max-w-3xl">
             <AssistantChat cityId={reading.id} cityName={reading.city} />
-          </div>
+          </TabPanel>
 
-          <div
-            role="tabpanel"
-            id={panelId("indoor")}
-            aria-labelledby="tab-indoor"
-            tabIndex={0}
-            hidden={activeTab !== "indoor"}
-            className="mx-auto max-w-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-          >
+          <TabPanel id="indoor" activeTab={activeTab} widthClass="mx-auto max-w-3xl">
             <IndoorHacks />
-          </div>
+          </TabPanel>
 
-          <div
-            role="tabpanel"
-            id={panelId("alternatives")}
-            aria-labelledby="tab-alternatives"
-            tabIndex={0}
-            hidden={activeTab !== "alternatives"}
-            className="mx-auto max-w-5xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+          <TabPanel
+            id="alternatives"
+            activeTab={activeTab}
+            widthClass="mx-auto max-w-5xl"
           >
             <SustainableAlternatives />
-          </div>
+          </TabPanel>
 
-          <div
-            role="tabpanel"
-            id={panelId("impact")}
-            aria-labelledby="tab-impact"
-            tabIndex={0}
-            hidden={activeTab !== "impact"}
-            className="mx-auto max-w-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-          >
+          <TabPanel id="impact" activeTab={activeTab} widthClass="mx-auto max-w-3xl">
             <ImpactCalculator />
-          </div>
+          </TabPanel>
         </div>
       </main>
 

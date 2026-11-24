@@ -1,15 +1,14 @@
 import {
+  AQI_SCALE_MAX,
   aqiPercent,
   classifyAqi,
   formatObservedAt,
   POLLUTANT_META,
+  POLLUTANT_ORDER,
   pollutantSeverity,
   type CityReading,
-  type PollutantKey,
   type Severity,
 } from "@/lib/air-quality";
-
-const POLLUTANT_ORDER: readonly PollutantKey[] = ["pm25", "pm10", "no2", "o3", "co"];
 
 const SEVERITY_TEXT: Readonly<Record<Severity, string>> = {
   low: "text-emerald-700",
@@ -62,9 +61,9 @@ export function AirQualityPanel({ reading }: { reading: CityReading }) {
             role="meter"
             aria-valuenow={reading.aqi}
             aria-valuemin={0}
-            aria-valuemax={500}
-            aria-valuetext={`${reading.aqi} out of 500 — ${classification.label}`}
-            aria-label="Air quality index on a 0 to 500 scale"
+            aria-valuemax={AQI_SCALE_MAX}
+            aria-valuetext={`${reading.aqi} out of ${AQI_SCALE_MAX} — ${classification.label}`}
+            aria-label={`Air quality index on a 0 to ${AQI_SCALE_MAX} scale`}
             className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200"
           >
             <div

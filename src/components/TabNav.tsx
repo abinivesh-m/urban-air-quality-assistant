@@ -43,8 +43,10 @@ export function TabNav<T extends string>({
 
     if (nextIndex === null) return;
 
-    event.preventDefault();
     const nextTab = tabs[nextIndex];
+    if (!nextTab) return;
+
+    event.preventDefault();
     onChange(nextTab.id);
     buttonRefs.current[nextTab.id]?.focus();
   }

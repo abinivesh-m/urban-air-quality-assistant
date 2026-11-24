@@ -7,10 +7,11 @@ const nextConfig = {
   /**
    * Baseline security headers.
    *
-   * The CSP allows only same-origin scripts and styles, which Next's App Router
-   * build satisfies without needing `unsafe-eval` in production. Inline styles
-   * are permitted because component-level `style` attributes are used for the
-   * AQI progress bar width.
+   * `script-src` allows `'unsafe-inline'` because the App Router streams its
+   * bootstrap and flight data through inline scripts; `'unsafe-eval'` is not
+   * needed and is deliberately absent. `style-src` allows inline styles for the
+   * AQI progress-bar width and Next's style injection. Everything else is
+   * locked to same-origin, and framing is refused outright.
    */
   async headers() {
     const csp = [

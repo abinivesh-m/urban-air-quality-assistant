@@ -29,16 +29,22 @@ either over-reacting (locking everyone indoors for a week) or under-reacting
 The assistant is built around a small, explicit domain model instead of a
 free-form chatbot:
 
-1. **Air quality model** (`src/lib/air-quality.ts`) maps an AQI reading onto
+1. **Air quality model** (`src/lib/air-quality/`) maps an AQI reading onto
    the EPA bands, classifies each pollutant against its own reference limit,
    and derives a prioritised action list from the *combination* of the headline
    band and the dominant pollutant. A PM2.5 smog episode and a NO₂ traffic peak
-   at the same AQI therefore produce different advice.
-2. **Conversational layer** (`src/lib/assistant.ts`) scores each message against
-   a curated intent table, weighting longer keyword matches more heavily so a
-   specific phrase such as "air purifier" outranks a generic one such as "air".
-   When a city reading is available, answers are grounded in it ("New Delhi is
-   at AQI 285 — that is too high for outdoor training…").
+   at the same AQI therefore produce different advice. The package is split into
+   `types`, `categories`, `pollutants`, `cities`, `recommendations` and `format`
+   modules behind a stable `index.ts` barrel, so every consumer keeps importing
+   from `@/lib/air-quality`.
+2. **Conversational layer** (`src/lib/assistant.ts` + `src/lib/intents.ts`) scores
+   each message against a curated intent catalogue, weighting longer keyword
+   matches more heavily so a specific phrase such as "air purifier" outranks a
+   generic one such as "air". Keywords match on word boundaries, so "hi" does
+   not fire inside "this" while plural forms such as "swaps" still match. The
+   catalogue is plain data, separate from the scoring engine. When a city
+   reading is available, answers are grounded in it ("New Delhi is at AQI 285 —
+   that is too high for outdoor training…").
 3. **Impact model** (`src/lib/impact.ts`) converts daily habits into an annual
    CO₂ total using documented emission factors, and computes the saving from a
    set of achievable swaps, so the user sees the consequence of a choice rather
@@ -77,47 +83,56 @@ props, which is what makes them unit-testable.
 ## Project structure
 
 ```
-├── .github/
-│   └── workflows/
-│       └── ci.yml             # lint, typecheck, tests, build
-├── e2e/
-│   └── smoke.spec.ts          # Playwright end-to-end smoke tests
-src/
-├── app/
-│   ├── api/chat/route.ts      # chat endpoint (validation, rate limit, GenAI/rules)
-│   ├── error.tsx              # route-level error boundary
-│   ├── globals.css            # design tokens, components, reduced-motion support
-│   ├── layout.tsx             # metadata, viewport
-│   ├── not-found.tsx          # 404 page
-│   └── page.tsx               # composition root
-├── components/
-│   ├── AirQualityPanel.tsx
-│   ├── AssistantChat.tsx
-│   ├── CitySelector.tsx
-│   ├── Footer.tsx
-│   ├── IndoorHacks.tsx
-│   ├── ImpactCalculator.tsx
-│   ├── PollutantGuide.tsx
-│   ├── Recommendations.tsx
-│   ├── SustainableAlternatives.tsx
-│   ├── TabNav.tsx             # WAI-ARIA tabs with full keyboard support
-│   └── content-icons.tsx      # icon-key to lucide mapping
-├── lib/
-│   ├── air-quality.ts         # domain model + recommendation rules
-│   ├── assistant.ts           # intent scoring + contextual answers
-│   ├── content.ts             # indoor hacks + sustainable alternatives
-│   ├── impact.ts              # carbon maths
-│   ├── llm.ts                 # optional GenAI provider layer
-│   └── rate-limit.ts          # fixed-window limiter
-└── test/
-    ├── air-quality.test.ts
-    ├── assistant.test.ts
-    ├── api-chat.test.ts
-    ├── components.test.tsx
-    ├── impact.test.ts
-    ├── llm.test.ts
-    ├── rate-limit.test.ts
-    └── setup.ts
+urban-air-quality-assistant/
+├── .github/workflows/ci.yml       # lint, typecheck, tests, build
+├── e2e/smoke.spec.ts              # Playwright end-to-end smoke tests
+└── src/
+    ├── app/
+    │   ├── api/chat/route.ts      # validation, rate limit, GenAI/rules
+    │   ├── error.tsx              # route-level error boundary
+    │   ├── globals.css            # design tokens, reduced-motion support
+    │   ├── layout.tsx             # metadata, viewport
+    │   ├── not-found.tsx          # 404 page
+    │   └── page.tsx               # composition root + TabPanel
+    ├── components/
+    │   ├── AirQualityPanel.tsx
+    │   ├── AssistantChat.tsx
+    │   ├── CitySelector.tsx
+    │   ├── ContentIcons.tsx       # icon-key to lucide mapping
+    │   ├── Footer.tsx
+    │   ├── ImpactCalculator.tsx
+    │   ├── IndoorHacks.tsx
+    │   ├── PollutantGuide.tsx
+    │   ├── Recommendations.tsx
+    │   ├── SustainableAlternatives.tsx
+    │   └── TabNav.tsx             # WAI-ARIA tabs, full keyboard support
+    ├── lib/
+    │   ├── air-quality/           # domain package, imported as @/lib/air-quality
+    │   │   ├── categories.ts      # EPA bands, classification, scale helpers
+    │   │   ├── cities.ts          # sample dataset + safe lookups
+    │   │   ├── format.ts          # display formatting
+    │   │   ├── index.ts           # public barrel
+    │   │   ├── pollutants.ts      # reference limits + severity
+    │   │   ├── recommendations.ts # prioritised action rules
+    │   │   └── types.ts           # shared domain types
+    │   ├── assistant.ts           # intent scoring engine
+    │   ├── intents.ts             # curated intent catalogue (data)
+    │   ├── content.ts             # indoor hacks + sustainable alternatives
+    │   ├── impact.ts              # carbon maths
+    │   ├── llm.ts                 # provider config + OpenAI-compatible client
+    │   └── rate-limit.ts          # fixed-window limiter + client key
+    ├── test/
+    │   ├── air-quality.test.ts
+    │   ├── api-chat.test.ts
+    │   ├── assistant.test.ts
+    │   ├── components.test.tsx
+    │   ├── content.test.ts
+    │   ├── impact.test.ts
+    │   ├── intents.test.ts
+    │   ├── llm.test.ts
+    │   ├── rate-limit.test.ts
+    │   └── setup.ts
+    └── types/index.ts             # shared type barrel
 ```
 
 ## Tech stack
@@ -140,7 +155,8 @@ Open http://localhost:3000.
 ```bash
 npm run build   # production build
 npm run lint    # ESLint (next/core-web-vitals)
-npm test        # Vitest, 157 tests
+npm test        # Vitest, 176 tests
+npx playwright test  # end-to-end smoke tests
 ```
 
 ### GenAI configuration (optional)
@@ -148,10 +164,18 @@ npm test        # Vitest, 157 tests
 Set these environment variables to route answers through a GenAI provider:
 
 ```bash
+# OpenAI, or any OpenAI-compatible gateway (e.g. Antigravity)
 OPENAI_API_KEY=sk-...
-OPENAI_BASE_URL=https://api.openai.com/v1   # optional, any compatible gateway
+OPENAI_BASE_URL=https://api.openai.com/v1   # optional
 OPENAI_MODEL=gpt-4o-mini                    # optional
 OPENAI_TIMEOUT_MS=8000                      # optional, clamped to 30s
+
+# Google Gemini, used only when OPENAI_API_KEY is absent.
+# It speaks the OpenAI-compatible protocol, so no second client is needed.
+GEMINI_API_KEY=...
+GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai  # optional
+GEMINI_MODEL=gemini-2.0-flash              # optional
+GEMINI_TIMEOUT_MS=8000                     # optional
 ```
 
 Without a key the assistant uses the deterministic rule engine, so the app
@@ -161,7 +185,7 @@ works offline and in CI.
 
 - The air quality readings are **representative sample data**, not a live feed.
   The UI labels them as such. Plugging in a real provider (e.g. OpenAQ) means
-  replacing `CITIES` in `src/lib/air-quality.ts`; nothing else changes.
+  replacing `CITIES` in `src/lib/air-quality/cities.ts`; nothing else changes.
 - The assistant is **not a medical device** and does not diagnose.
 - Rate limiting is in-memory and per serverless instance; a high-traffic
   deployment should put an edge or WAF layer in front of `/api/chat`.
@@ -195,33 +219,35 @@ works offline and in CI.
 
 - Static prerendering of the main route; the chat route is server-rendered on
   demand.
-- First Load JS 100 kB; the chat component is only hydrated with the page.
+- First Load JS 103 kB; the chat component is only hydrated with the page.
 - Pure, dependency-free domain modules so the client bundle stays small.
 
 ## Testing
 
-157 unit and component tests across seven files, plus 7 end-to-end smoke tests
+176 unit and component tests across nine files, plus 7 end-to-end smoke tests
 (Playwright, `e2e/smoke.spec.ts`):
 
 | File | Covers |
 |---|---|
 | `air-quality.test.ts` | AQI classification boundaries, clamping, pollutants, city lookup, recommendations |
-| `assistant.test.ts` | intent mapping, fallback, contextual grounding, truncation |
+| `assistant.test.ts` | intent mapping, word boundaries, fallback, contextual grounding, truncation |
+| `intents.test.ts` | catalogue integrity: unique ids, unique keywords, every intent answers |
 | `impact.test.ts` | emission maths, clamping, savings, monotonicity |
 | `rate-limit.test.ts` | windows, reset, per-key isolation, header parsing |
-| `llm.test.ts` | config parsing, request shape, success/failure/malformed |
+| `llm.test.ts` | OpenAI/Gemini config resolution, request shape, success/failure/malformed |
 | `api-chat.test.ts` | validation, rate limiting, GenAI path and fallback |
 | `components.test.tsx` | rendering, tabs, filters, calculator, chat, home page |
+| `content.test.ts` | CO₂ formatting and content-catalogue integrity |
 | `e2e/smoke.spec.ts` | dashboard, city switch, tabs, assistant, accordion, calculator, skip link |
 
 ## Evaluation criteria mapping
 
 | Criterion | Where it is addressed |
 |---|---|
-| Code Quality | Split into focused, typed modules with single responsibilities; 157 tests |
+| Code Quality | Split into focused, typed modules with single responsibilities; 176 tests |
 | Security | Validation, rate limiting, security headers, no input reflection |
-| Efficiency | Static render, 100 kB First Load JS, pure domain modules |
-| Testing | 157 tests covering units, routes, components and accessibility hooks |
+| Efficiency | Static render, 103 kB First Load JS, pure domain modules |
+| Testing | 176 tests covering units, routes, components and accessibility hooks |
 | Accessibility | WCAG 2.2 AA measures listed above |
 | Problem Alignment | Air quality dashboard, indoor hacks, sustainable swaps, impact calculator, contextual assistant |
 
